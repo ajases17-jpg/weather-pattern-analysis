@@ -1,0 +1,189 @@
+<section class="card">
+    <h2>His<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Pattern Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f5ff;
+      color: #172554;
+    }
+    header {
+      background: #1d4ed8;
+      color: white;
+      padding: 25px 15px;
+      text-align: center;
+    }
+    main { max-width: 900px; margin: auto; padding: 18px; }
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 16px 0;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px #00000010;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    label { display: block; font-size: 14px; margin-bottom: 6px; }
+    input, select {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      border: 0;
+      background: #2563eb;
+      color: white;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .result {
+      background: #dbeafe;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .error { color: #b91c1c; }
+    canvas { max-height: 300px; }
+    footer { text-align: center; padding: 20px; color: #475569; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Weather Pattern Analysis</h1>
+  <p>Using Machine Learning</p>
+  <p>Kochi Weather | Random Forest Model</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Temperature Prediction</h2>
+    <p>Enter the weather details to predict temperature.</p>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form action="/predict" method="POST">
+      <div class="grid">
+        <div>
+          <label for="temperature">Current temperature (°C)</label>
+          <input id="temperature" name="temperature" type="number"
+                 step="any" value="30" required>
+        </div>
+        <div>
+          <label for="rainfall">Rainfall (mm)</label>
+          <input id="rainfall" name="rainfall" type="number"
+                 step="any" min="0" value="2" required>
+        </div>
+        <div>
+          <label for="humidity">Humidity (%)</label>
+          <input id="humidity" name="humidity" type="number"
+                 min="0" max="100" value="75" required>
+        </div>
+        <div>
+          <label for="wind_speed">Wind speed (km/h)</label>
+          <input id="wind_speed" name="wind_speed" type="number"
+                 step="any" min="0" value="12" required>
+        </div>
+        <div>
+          <label for="month">Month</label>
+          <select id="month" name="month">
+            {% for m in range(1, 13) %}
+              <option value="{{ m }}" {% if m == 10 %}selected{% endif %}>
+                {{ m }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="hour">Hour (0–23)</label>
+          <input id="hour" name="hour" type="number" min="0"
+                 max="23" value="14" required>
+        </div>
+      </div>
+      <button type="submit">Predict Temperature</button>
+    </form>
+
+    {% if prediction is not none %}
+      <div class="result">
+        <h2>Predicted Temperature: {{ prediction }} °C</h2>
+        <p>Temperature category: <strong>{{ category }}</strong></p>
+        <p>Difference from entered temperature: {{ difference }} °C</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Model Performance</h2>
+    <p>Mean Absolute Error (MAE): <strong>{{ mae if mae is not none else "Not available" }} °C</strong></p>
+    <p>Lower MAE generally means better prediction accuracy on test data.</p>
+  </section>
+
+  <section class="card">
+    <h2>Historical Temperature</h2>
+    <canvas id="tempChart"></canvas>
+  </section>torical Rainfall</h2>
+    <canvas id="rainChart"></canvas>
+  </section>
+
+  <section class="card">
+    <h2>Historical Humidity</h2>
+    <canvas id="humidityChart"></canvas>
+  </section>
+</main>
+
+<footer>Weather Pattern Analysis | Machine Learning Mini Project</footer>
+
+<script>
+  const weather = {{ graph_data | tojson }};
+  const labels = weather.labels || [];
+
+  function makeChart(id, label, values, color) {
+    new Chart(document.getElementById(id), {
+      type: "line",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: label,
+          data: values || [],
+          borderColor: color,
+          backgroundColor: color,
+          pointRadius: 0,
+          borderWidth: 2,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: { maxTicksLimit: 8 }
+          }
+        }
+      }
+    });
+  }
+
+  makeChart("tempChart", "Temperature (°C)", weather.temperature, "#2563eb");
+  makeChart("rainChart", "Rainfall (mm)", weather.rainfall, "#0891b2");
+  makeChart("humidityChart", "Humidity (%)", weather.humidity, "#16a34a");
+</script>
+</body>
+</html>
