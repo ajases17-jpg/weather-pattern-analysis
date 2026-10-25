@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Weather Pattern Analysis | ML</title>
+<title>Weather Pattern Analysis</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 :root {
   --green: #237a57;
   --dark: #174b38;
   --pale: #e8f5ec;
   --bg: #f5faf5;
-  --white: #ffffff;
   --text: #203b2d;
   --muted: #6b8172;
 }
@@ -23,43 +23,42 @@ body {
   color: var(--text);
 }
 header {
-  padding: 34px 18px;
-  color: white;
+  padding: 35px 15px;
   text-align: center;
+  color: white;
   background: linear-gradient(135deg, #174b38, #31966b);
 }
-header .leaf { font-size: 38px; }
+.leaf { font-size: 38px; }
 header h1 { margin: 10px 0; font-size: 29px; }
-header p { margin: 7px 0; color: #e0f3e6; }
+header p { color: #e0f3e6; }
 .tag {
   display: inline-block;
-  margin-top: 8px;
-  padding: 7px 12px;
+  padding: 8px 13px;
   border: 1px solid #ffffff66;
   border-radius: 20px;
   font-size: 12px;
 }
 main { max-width: 960px; margin: auto; padding: 18px; }
 .card {
-  background: var(--white);
+  background: white;
   padding: 22px;
   margin: 18px 0;
   border: 1px solid #e0eee3;
   border-radius: 18px;
   box-shadow: 0 5px 18px #174b380a;
 }
-h2 { margin-top: 0; color: var(--dark); }
+h2 { color: var(--dark); margin-top: 0; }
 .subtitle { color: var(--muted); line-height: 1.5; }
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
-  gap: 14px;
+  gap: 15px;
 }
 label {
   display: block;
+  margin-bottom: 7px;
   font-size: 13px;
   font-weight: bold;
-  margin-bottom: 7px;
 }
 input, select {
   width: 100%;
@@ -70,17 +69,15 @@ input, select {
   color: var(--text);
   font-size: 16px;
 }
-input:focus, select:focus {
-  outline: 2px solid #8bc8a2;
-}
+input:focus, select:focus { outline: 2px solid #8bc8a2; }
 button {
   width: 100%;
   padding: 14px;
   margin-top: 20px;
-  border: none;
+  border: 0;
   border-radius: 10px;
-  color: white;
   background: var(--green);
+  color: white;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -94,18 +91,17 @@ button:hover { background: var(--dark); }
   border-radius: 14px;
 }
 .result-number {
+  margin: 8px 0;
+  color: var(--green);
   font-size: 34px;
   font-weight: bold;
-  color: var(--green);
-  margin: 8px 0;
 }
 .metric {
-  background: #f0f8f1;
+  margin-top: 12px;
   padding: 15px;
   border-radius: 12px;
-  margin-top: 12px;
+  background: #f0f8f1;
 }
-.metric strong { color: var(--dark); }
 .error { color: #b42318; }
 .chart-wrap { height: 280px; }
 footer {
@@ -114,7 +110,7 @@ footer {
   color: var(--muted);
   font-size: 13px;
 }
-@media (max-width: 480px) {
+@media(max-width:480px) {
   header h1 { font-size: 24px; }
   main { padding: 10px; }
   .card { padding: 17px; }
@@ -122,126 +118,146 @@ footer {
 }
 </style>
 </head>
-<body>
 
+<body>
 <header>
   <div class="leaf">🌿</div>
   <h1>Weather Pattern Analysis</h1>
-  <p>Understanding weather through Machine Learning</p>
+  <p>Understanding Weather Through Machine Learning</p>
   <span class="tag">AI · RANDOM FOREST · KOCHI</span>
 </header>
 
 <main>
-  <section class="card">
-    <h2>🌱 Temperature Predictor</h2>
-    <p class="subtitle">
-      Enter weather details below to estimate temperature using our
-      machine learning model.
-    </p>
+<section class="card">
+  <h2>🌱 Temperature Predictor</h2>
+  <p class="subtitle">
+    Enter weather details to estimate temperature using our
+    machine learning model.
+  </p>
 
-    {% if error %}
-      <p class="error">{{ error }}</p>
-    {% endif %}
+  {% if error is defined and error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
 
-    <form action="/predict" method="POST">
-      <div class="grid">
-        <div>
-          <label for="temperature">Current temperature (°C)</label>
-          <input id="temperature" name="temperature" type="number"
-                 step="any" value="30" required>
-        </div>
-        <div>
-          <label for="rainfall">Rainfall (mm)</label>
-          <input id="rainfall" name="rainfall" type="number"
-                 step="any" min="0" value="2" required>
-        </div>
-        <div>
-          <label for="humidity">Humidity (%)</label>
-          <input id="humidity" name="humidity" type="number"
-                 min="0" max="100" value="75" required>
-        </div>
-        <div>
-          <label for="wind_speed">Wind speed (km/h)</label>
-
-          <input id="wind_speed" name="wind_speed" type="number"
-                 step="any" min="0" value="12" required>
-        </div>
-        <div>
-          <label for="month">Month</label>
-          <select id="month" name="month">
-            {% for m in range(1, 13) %}
-            <option value="{{ m }}" {% if m == 10 %}selected{% endif %}>
-              {{ m }}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div>
-          <label for="hour">Hour (0–23)</label>
-          <input id="hour" name="hour" type="number"
-                 min="0" max="23" value="14" required>
-        </div>
+  <form action="/predict" method="POST">
+    <div class="grid">
+      <div>
+        <label for="temperature">Current temperature (°C)</label>
+        <input id="temperature" name="temperature" type="number"
+          step="any" required
+          value="{{ request.form.get('temperature', '30') }}">
       </div>
-      <button type="submit">Predict Temperature →</button>
-    </form>
 
-    {% if prediction is not none %}
-    <div class="result">
-      <p>YOUR PREDICTED TEMPERATURE</p>
-      <div class="result-number">{{ prediction }} °C</div>
+      <div>
+        <label for="rainfall">Rainfall (mm)</label>
+        <input id="rainfall" name="rainfall" type="number"
+          step="any" min="0" required
+          value="{{ request.form.get('rainfall', '2') }}">
+      </div>
+
+      <div>
+        <label for="humidity">Humidity (%)</label>
+        <input id="humidity" name="humidity" type="number"
+          min="0" max="100" required
+          value="{{ request.form.get('humidity', '75') }}">
+      </div>
+
+      <div>
+        <label for="wind_speed">Wind speed (km/h)</label>
+        <input id="wind_speed" name="wind_speed" type="number"
+          step="any" min="0" required
+          value="{{ request.form.get('wind_speed', '12') }}">
+      </div>
+      <div>
+        <label for="month">Month</label>
+        <select id="month" name="month">
+          {% for m in range(1, 13) %}
+          <option value="{{ m }}"
+            {% if request.form.get('month', '10')|int == m %}selected{% endif %}>
+            {{ m }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div>
+        <label for="hour">Hour (0–23)</label>
+        <input id="hour" name="hour" type="number"
+          min="0" max="23" required
+          value="{{ request.form.get('hour', '14') }}">
+      </div>
+    </div>
+
+    <button type="submit">Predict Temperature →</button>
+  </form>
+
+  {% set result_temp = prediction if prediction is defined else (predicted if predicted is defined else none) %}
+
+  {% if result_temp is not none %}
+  <div class="result">
+    <p>YOUR PREDICTED TEMPERATURE</p>
+    <div class="result-number">{{ result_temp }} °C</div>
+
+    {% if category is defined %}
       <p>Weather category: <strong>{{ category }}</strong></p>
-      <div class="metric">
-        <strong>Temperature difference</strong>
-        <p>{{ difference }} °C</p>
-      </div>
+    {% endif %}
+
+    {% if difference is defined %}
+    <div class="metric">
+      <strong>Temperature difference</strong>
+      <p>{{ difference }} °C</p>
     </div>
     {% endif %}
-  </section>
+  </div>
+  {% endif %}
+</section>
 
-  <section class="card">
-    <h2>📊 Model Performance</h2>
-    <div class="metric">
-      <strong>Mean Absolute Error (MAE)</strong>
-      <p>{{ mae if mae is not none else "Not available" }} °C</p>
-      <span class="subtitle">Lower MAE indicates smaller average prediction errors on test data.</span>
-    </div>
-  </section>
+<section class="card">
+  <h2>📊 Model Performance</h2>
+  <div class="metric">
+    <strong>Mean Absolute Error (MAE)</strong>
+    <p>{{ mae if mae is defined else 'Not available' }} °C</p>
+    <span class="subtitle">
+      Lower MAE means smaller average prediction errors on test data.
+    </span>
+  </div>
+</section>
 
-  <section class="card">
-    <h2>🌡️ Temperature Trends</h2>
-    <p class="subtitle">Historical hourly temperature data.</p>
-    <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
-  </section>
+<section class="card">
+  <h2>🌡️ Temperature Trends</h2>
+  <p class="subtitle">Historical temperature data.</p>
+  <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+</section>
 
-  <section class="card">
-    <h2>🌧️ Rainfall Analysis</h2>
-    <p class="subtitle">Historical precipitation patterns.</p>
-    <div class="chart-wrap"><canvas id="rainChart"></canvas></div>
-  </section>
+<section class="card">
+  <h2>🌧️ Rainfall Analysis</h2>
+  <p class="subtitle">Historical rainfall patterns.</p>
+  <div class="chart-wrap"><canvas id="rainChart"></canvas></div>
+</section>
 
-  <section class="card">
-    <h2>💧 Humidity Analysis</h2>
-    <p class="subtitle">Changes in relative humidity over time.</p>
-    <div class="chart-wrap"><canvas id="humidityChart"></canvas></div>
-  </section>
+<section class="card">
+  <h2>💧 Humidity Analysis</h2>
+  <p class="subtitle">Historical humidity patterns.</p>
+  <div class="chart-wrap"><canvas id="humidityChart"></canvas></div>
+</section>
 </main>
 
 <footer>
   <p>🌿 Weather Pattern Analysis using Machine Learning</p>
-  <p>Academic Mini Project · Powered by Python & Random Forest</p>
+  <p>Academic Mini Project · Python · Random Forest</p>
 </footer>
 
 <script>
 const weather = {{ graph_data | tojson }};
 const labels = weather.labels || [];
 
-function makeChart(id, label, values, color) {
+function makeChart(id, title, values, color) {
   new Chart(document.getElementById(id), {
     type: "line",
     data: {
       labels: labels,
       datasets: [{
-        label: label,
+        label: title,
         data: values || [],
         borderColor: color,
         backgroundColor: color + "22",
