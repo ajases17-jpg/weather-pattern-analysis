@@ -151,7 +151,9 @@ def predict():
             "wind_speed": wind_speed,
             "month": month,
             "hour": hour
-        }])predicted = round(float(model.predict(inputs)[0]), 2)
+        }])
+        
+        predicted = round(float(model.predict(inputs)[0]), 2)
         difference = round(abs(temperature - predicted), 2)
 
         if predicted >= 35:
