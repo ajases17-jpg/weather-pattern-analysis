@@ -82,7 +82,7 @@ def train_model():
         mean_absolute_error(y_test, test_predictions), 2
     )
 
-    chart = df.head(168)
+    chart = df.iloc[::24].copy()
 
     graph_data = {
         "labels": chart["time"].dt.strftime("%d %H:%M").tolist(),
